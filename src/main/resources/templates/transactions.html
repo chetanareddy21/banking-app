@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Transactions</title></head>
+<body>
+<h2>Transaction Statement</h2>
+<input type="text" id="accNo" placeholder="Account Number">
+<button onclick="loadTransactions()">View</button>
+
+<table border="1">
+    <thead><tr><th>Type</th><th>Amount</th><th>Balance After</th><th>Description</th><th>Time</th></tr></thead>
+    <tbody id="txTable"></tbody>
+</table>
+<p><a href="/user-dashboard">Back</a></p>
+
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login';
+
+    function loadTransactions() {
+        const accountNumber = document.getElementById('accNo').value;
+        fetch(`/api/account/transactions?accountNumber=${accountNumber}`, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+            .then(res => res.ok ? res.json() : Promise.reject())
+            .then(txns => {
+                const tbody = document.getElementById('txTable');
+                tbody.innerHTML = '';
+                txns.forEach(t => {
+                    tbody.innerHTML += `<tr><td>${t.type}</td><td>${t.amount}</td><td>${t.balanceAfter}</td><td>${t.description}</td><td>${new Date(t.timestamp).toLocaleString()}</td></tr>`;
+                });
+            })
+            .catch(() => document.getElementById('txTable').innerHTML = '<tr><td colspan="5">No data / invalid account</td></tr>');
+    }
+</script>
+</body>
+</html>

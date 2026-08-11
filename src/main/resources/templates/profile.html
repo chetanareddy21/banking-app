@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Profile</title></head>
+<body>
+<h2>Profile</h2>
+<p>Username: <span id="username">-</span></p>
+<table border="1">
+    <thead><tr><th>Account Number</th><th>Balance</th></tr></thead>
+    <tbody id="accountsTable"></tbody>
+</table>
+<p><a href="/user-dashboard">Back</a></p>
+
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login';
+
+    fetch('/api/user/profile', { headers: { 'Authorization': 'Bearer ' + token } })
+        .then(res => res.ok ? res.json() : Promise.reject())
+        .then(data => {
+            document.getElementById('username').innerText = data.username;
+            const tbody = document.getElementById('accountsTable');
+            data.accounts.forEach(a => {
+                tbody.innerHTML += `<tr><td>${a.accountNumber}</td><td>${a.balance}</td></tr>`;
+            });
+        })
+        .catch(() => window.location.href = '/login');
+</script>
+</body>
+</html>

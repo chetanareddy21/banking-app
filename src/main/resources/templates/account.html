@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Account</title>
+</head>
+<body>
+<h2>My Account</h2>
+<p>Account Number: <span id="accNumber">-</span></p>
+<p>Balance: ₹<span id="balance">-</span></p>
+
+<h3>Deposit</h3>
+<input type="number" id="depositAmount" placeholder="Amount" step="0.01">
+<button onclick="deposit()">Deposit</button>
+
+<h3>Withdraw</h3>
+<input type="number" id="withdrawAmount" placeholder="Amount" step="0.01">
+<button onclick="withdraw()">Withdraw</button>
+
+<h3>Transfer</h3>
+<input type="text" id="toAccount" placeholder="Recipient Account Number">
+<input type="number" id="transferAmount" placeholder="Amount" step="0.01">
+<button onclick="transfer()">Transfer</button>
+
+<h3>Transaction History</h3>
+<table border="1" id="txTable">
+    <thead>
+    <tr><th>Type</th><th>Amount</th><th>Balance After</th><th>Description</th><th>Time</th></tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<p><a href="/user-dashboard">Back to Dashboard</a></p>
+
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login';
+    const headers = { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+
+    async function loadAccount() {
+        const res = await fetch('/api/account/balance', { headers });
+        if (!res.ok) { window.location.href = '/login'; return; }
+        const data = await res.json();
+        document.getElementById('accNumber').innerText = data.accountNumber;
+        document.getElementById('balance').innerText = data.balance;
+        loadTransactions();
+    }
+
+    async function loadTransactions() {
+        const res = await fetch('/api/account/transactions', { headers });
+        const txns = await res.json();
+        const tbody = document.querySelector('#txTable tbody');
+        tbody.innerHTML = '';
+        txns.forEach(t => {
+            const row = `<tr><td>${t.type}</td><td>${t.amount}</td><td>${t.balanceAfter}</td><td>${t.description}</td><td>${new Date(t.timestamp).toLocaleString()}</td></tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    async function deposit() {
+        const amount = document.getElementById('depositAmount').value;
+        const res = await fetch('/api/account/deposit', { method: 'POST', headers, body: JSON.stringify({ amount }) });
+        if (res.ok) loadAccount(); else alert('Deposit failed');
+    }
+
+    async function withdraw() {
+        const amount = document.getElementById('withdrawAmount').value;
+        const res = await fetch('/api/account/withdraw', { method: 'POST', headers, body: JSON.stringify({ amount }) });
+        if (res.ok) loadAccount(); else alert('Withdrawal failed — check your balance');
+    }
+
+    async function transfer() {
+        const toAccountNumber = document.getElementById('toAccount').value;
+        const amount = document.getElementById('transferAmount').value;
+        const res = await fetch('/api/account/transfer', { method: 'POST', headers, body: JSON.stringify({ toAccountNumber, amount }) });
+        if (res.ok) loadAccount(); else alert('Transfer failed — check the account number and balance');
+    }
+
+    loadAccount();
+</script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Secure Banking</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="container">
+    <div class="brand">
+        <div class="brand-badge">◉</div>
+        <h2>Dashboard</h2>
+        <p class="subtitle">Your secure banking workspace</p>
+    </div>
+
+    <div class="card-panel">
+        <p class="card-title">Welcome back</p>
+        <p class="card-copy">Manage your profile, deposits, withdrawals, and account activity from one place.</p>
+    </div>
+
+    <div class="dashboard-actions">
+        <button onclick="location.href='/profile'">Profile</button>
+        <button onclick="location.href='/deposit'">Deposit</button>
+        <button onclick="location.href='/withdraw'">Withdraw</button>
+        <button onclick="location.href='/transactions'">Statements</button>
+    </div>
+
+    <div class="footer-link">
+        <button onclick="logout()">Sign Out</button>
+    </div>
+</div>
+
+<script>
+    if (!localStorage.getItem('token')) window.location.href = '/login';
+    function logout() { localStorage.clear(); window.location.href = '/login'; }
+</script>
+</body>
+</html>

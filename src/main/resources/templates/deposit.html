@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit Funds</title>
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --primary-hover: #0b5ed7;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --text-muted: #6c757d;
+            --border-color: #ced4da;
+            --focus-ring: rgba(13, 110, 253, 0.25);
+            --success-bg: #d1e7dd;
+            --success-color: #0f5132;
+            --error-bg: #f8d7da;
+            --error-color: #842029;
+            --radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 400px;
+            padding: 32px 28px;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .card p.subtitle {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            outline: none;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--focus-ring);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: background-color 0.15s ease-in-out;
+            margin-top: 8px;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .result-message {
+            display: none;
+            margin-top: 20px;
+            padding: 12px 16px;
+            font-size: 0.875rem;
+            border-radius: var(--radius);
+            text-align: center;
+            word-break: break-word;
+        }
+
+        .result-message.success {
+            display: block;
+            background-color: var(--success-bg);
+            color: var(--success-color);
+            border: 1px solid #badbcc;
+        }
+
+        .result-message.error {
+            display: block;
+            background-color: var(--error-bg);
+            color: var(--error-color);
+            border: 1px solid #f5c2c7;
+        }
+
+        .result-message.info {
+            display: block;
+            background-color: #e2e3e5;
+            color: #41464b;
+            border: 1px solid #d3d6d8;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.875rem;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Deposit Funds</h2>
+    <p class="subtitle">Enter your details to perform a deposit.</p>
+
+    <form id="depositForm" onsubmit="event.preventDefault(); deposit();">
+        <div class="form-group">
+            <label for="accNo">Account Number</label>
+            <input
+                    type="text"
+                    id="accNo"
+                    class="form-control"
+                    placeholder="Enter account number"
+                    required
+                    autocomplete="off"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="pin">PIN</label>
+            <input
+                    type="password"
+                    id="pin"
+                    class="form-control"
+                    placeholder="Enter PIN"
+                    maxlength="6"
+                    pattern="[0-9]{4,6}"
+                    required
+                    inputmode="numeric"
+                    autocomplete="current-password"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="amount">Amount ($)</label>
+            <input
+                    type="number"
+                    id="amount"
+                    class="form-control"
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0.01"
+                    required
+            >
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn-submit">Deposit</button>
+    </form>
+
+    <div id="result" class="result-message" role="status" aria-live="polite"></div>
+
+    <a th:href="@{/user-dashboard}" href="/user-dashboard" class="back-link">&larr; Back to Dashboard</a>
+</div>
+
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/login';
+    }
+
+    async function deposit() {
+        const accNoInput = document.getElementById('accNo');
+        const pinInput = document.getElementById('pin');
+        const amountInput = document.getElementById('amount');
+        const submitBtn = document.getElementById('submitBtn');
+
+        const accountNumber = accNoInput.value.trim();
+        const pin = pinInput.value.trim();
+        const amount = parseFloat(amountInput.value);
+
+        if (!accountNumber || !pin || isNaN(amount) || amount <= 0) {
+            showStatus('Please enter a valid account number, PIN, and amount.', 'error');
+            return;
+        }
+
+        submitBtn.disabled = true;
+        showStatus('Processing deposit...', 'info');
+
+        try {
+            const response = await fetch('/api/account/deposit', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ accountNumber, pin, amount })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showStatus(`Deposit successful! New balance: $${Number(data.balance).toFixed(2)}`, 'success');
+                pinInput.value = '';
+                amountInput.value = '';
+            } else {
+                const errorMessage = data.message || data.error || 'Deposit failed — check account number, PIN, or amount.';
+                showStatus(errorMessage, 'error');
+            }
+        } catch (error) {
+            showStatus('Network error or server unreachable. Please try again.', 'error');
+        } finally {
+            submitBtn.disabled = false;
+        }
+    }
+
+    function showStatus(message, type) {
+        const resultDiv = document.getElementById('result');
+        resultDiv.className = `result-message ${type}`;
+        resultDiv.innerText = message;
+    }
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head><meta charset="UTF-8"><title>Deposit</title></head>-->
+<!--<body>-->
+<!--<h2>Deposit</h2>-->
+<!--<input type="text" id="accNo" placeholder="Account Number"><br>-->
+<!--<input type="number" id="amount" placeholder="Amount" step="0.01"><br>-->
+<!--<button onclick="deposit()">OK</button>-->
+<!--<p id="result"></p>-->
+<!--<p><a href="/user-dashboard">Back</a></p>-->
+
+<!--<script>-->
+<!--    const token = localStorage.getItem('token');-->
+<!--    if (!token) window.location.href = '/login';-->
+
+<!--    function deposit() {-->
+<!--        const accountNumber = document.getElementById('accNo').value;-->
+<!--        const amount = document.getElementById('amount').value;-->
+
+<!--        fetch('/api/account/deposit', {-->
+<!--            method: 'POST',-->
+<!--            headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },-->
+<!--            body: JSON.stringify({ accountNumber, amount })-->
+<!--        })-->
+<!--            .then(res => res.ok ? res.json() : Promise.reject(res))-->
+<!--            .then(data => document.getElementById('result').innerText = `New balance: ${data.balance}`)-->
+<!--            .catch(() => document.getElementById('result').innerText = 'Deposit failed — check account number');-->
+<!--    }-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->

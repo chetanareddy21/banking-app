@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Accounts - Administrative Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Top Header Bar */
+        .header {
+            background: linear-gradient(90deg, #003366 0%, #002244 100%);
+            color: #ffffff;
+            padding: 15px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .header .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-badge {
+            background-color: #F37021;
+            color: #ffffff;
+            font-weight: bold;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .header .logo {
+            font-size: 22px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .header .logo span {
+            color: #F37021;
+            margin-left: 4px;
+        }
+
+        .btn-back {
+            background-color: transparent;
+            color: #ffffff;
+            border: 1px solid #ffffff;
+            padding: 7px 16px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-back:hover {
+            background-color: #F37021;
+            border-color: #F37021;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            max-width: 1100px;
+            width: 100%;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .content-card {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border-top: 5px solid #003366;
+        }
+
+        .card-header {
+            background-color: #fafafa;
+            padding: 20px 30px;
+            border-bottom: 1px solid #eeeeee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            font-size: 20px;
+            color: #003366;
+            font-weight: 700;
+        }
+
+        .card-body {
+            padding: 25px 30px;
+        }
+
+        /* Search Section */
+        .search-box {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 11px 16px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .search-input:focus {
+            border-color: #003366;
+            box-shadow: 0 0 5px rgba(0, 51, 102, 0.2);
+        }
+
+        .btn-search {
+            background-color: #003366;
+            color: #ffffff;
+            border: none;
+            padding: 11px 24px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-search:hover {
+            background-color: #002244;
+        }
+
+        /* Table Styling */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .data-table th {
+            background-color: #f1f4f8;
+            color: #003366;
+            font-weight: bold;
+            padding: 12px 16px;
+            border-bottom: 2px solid #dcdcdc;
+        }
+
+        .data-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #eeeeee;
+            color: #444;
+            vertical-align: middle;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #fcfcfc;
+        }
+
+        /* Controls & Form Inputs inside Table */
+        .input-inline {
+            padding: 6px 10px;
+            font-size: 13px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 8px;
+            outline: none;
+        }
+
+        .input-inline:focus {
+            border-color: #003366;
+        }
+
+        .btn-save {
+            background-color: #28a745;
+            color: #ffffff;
+            border: none;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .btn-save:hover {
+            background-color: #218838;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: #ffffff;
+            border: none;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #888;
+            padding: 20px;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #eef2f5;
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            color: #666666;
+            border-top: 1px solid #dddddd;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header Bar -->
+<div class="header">
+    <div class="logo-container">
+        <div class="brand-badge">A</div>
+        <div class="logo">BANKING<span>APP</span></div>
+    </div>
+    <a href="/admin-dashboard" class="btn-back">← Dashboard</a>
+</div>
+
+<!-- Main Content -->
+<div class="main-container">
+    <div class="content-card">
+        <div class="card-header">
+            <h2 id="pageTitle">Accounts</h2>
+        </div>
+
+        <div class="card-body">
+            <!-- Search Controls -->
+            <div class="search-box">
+                <input type="text" id="query" class="search-input" placeholder="Search by username or account number...">
+                <button class="btn-search" onclick="search()">Search Account</button>
+            </div>
+
+            <!-- Account Table -->
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Account Number</th>
+                        <th>Balance ($)</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody id="resultsTable">
+                    <tr>
+                        <td colspan="4" class="no-data">Use the search box above to find accounts.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    &copy; Banking Application. All Rights Reserved.
+</div>
+
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login';
+
+    const mode = new URLSearchParams(window.location.search).get('mode') || 'search';
+    document.getElementById('pageTitle').innerText =
+        mode === 'delete' ? 'Delete Account' : mode === 'modify' ? 'Modify Account Balance' : 'Search Accounts';
+
+    function search() {
+        const query = document.getElementById('query').value;
+        fetch(`/api/admin/accounts/search?query=${query}`, {
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+            .then(res => {
+                if (!res.ok) throw new Error();
+                return res.json();
+            })
+            .then(renderResults)
+            .catch(() => {
+                document.getElementById('resultsTable').innerHTML =
+                    '<tr><td colspan="4" class="no-data">No matching accounts found.</td></tr>';
+            });
+    }
+
+    function renderResults(accounts) {
+        const tbody = document.getElementById('resultsTable');
+        tbody.innerHTML = '';
+
+        if (accounts.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="no-data">No accounts found matching search criteria.</td></tr>';
+            return;
+        }
+
+        accounts.forEach(a => {
+            let actionCell = '';
+            if (mode === 'delete') {
+                actionCell = `<button class="btn-delete" onclick="deleteAccount('${a.accountNumber}')">Delete Account</button>`;
+            } else if (mode === 'modify') {
+                actionCell = `<input type="number" id="bal-${a.accountNumber}" class="input-inline" value="${a.balance}" step="0.01" style="width:110px">
+                                  <button class="btn-save" onclick="modifyAccount('${a.accountNumber}')">Save</button>`;
+            } else {
+                actionCell = '<span style="color: #888;">View Only</span>';
+            }
+            tbody.innerHTML += `<tr><td><strong>${a.username}</strong></td><td><code>${a.accountNumber}</code></td><td>$${parseFloat(a.balance).toFixed(2)}</td><td>${actionCell}</td></tr>`;
+        });
+    }
+
+    function deleteAccount(accountNumber) {
+        if (!confirm(`Are you sure you want to delete account ${accountNumber}? This action cannot be undone.`)) return;
+        fetch(`/api/admin/accounts/${accountNumber}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+            .then(res => {
+                if (!res.ok) throw new Error();
+                search();
+            })
+            .catch(() => alert('Delete operation failed. Please check permissions.'));
+    }
+
+    function modifyAccount(accountNumber) {
+        const newBalance = document.getElementById(`bal-${accountNumber}`).value;
+        fetch(`/api/admin/accounts/${accountNumber}`, {
+            method: 'PUT',
+            headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ balance: newBalance })
+        })
+            .then(res => {
+                if (!res.ok) throw new Error();
+                alert('Balance updated successfully');
+                search();
+            })
+            .catch(() => alert('Failed to update account balance.'));
+    }
+</script>
+</body>
+</html>
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head><meta charset="UTF-8"><title>Manage Accounts</title></head>-->
+<!--<body>-->
+<!--<h2 id="pageTitle">Accounts</h2>-->
+<!--<input type="text" id="query" placeholder="Search by username or account number">-->
+<!--<button onclick="search()">Search</button>-->
+
+<!--<table border="1">-->
+<!--    <thead><tr><th>Username</th><th>Account Number</th><th>Balance</th><th>Action</th></tr></thead>-->
+<!--    <tbody id="resultsTable"></tbody>-->
+<!--</table>-->
+<!--<p><a href="/admin-dashboard">Back</a></p>-->
+
+<!--<script>-->
+<!--    const token = localStorage.getItem('token');-->
+<!--    if (!token) window.location.href = '/login';-->
+
+<!--    const mode = new URLSearchParams(window.location.search).get('mode') || 'search';-->
+<!--    document.getElementById('pageTitle').innerText =-->
+<!--        mode === 'delete' ? 'Delete Account' : mode === 'modify' ? 'Modify Account' : 'Search Accounts';-->
+
+<!--    function search() {-->
+<!--        const query = document.getElementById('query').value;-->
+<!--        fetch(`/api/admin/accounts/search?query=${query}`, {-->
+<!--            headers: { 'Authorization': 'Bearer ' + token }-->
+<!--        })-->
+<!--            .then(res => res.json())-->
+<!--            .then(renderResults)-->
+<!--            .catch(() => document.getElementById('resultsTable').innerHTML = '<tr><td colspan="4">No results</td></tr>');-->
+<!--    }-->
+
+<!--    function renderResults(accounts) {-->
+<!--        const tbody = document.getElementById('resultsTable');-->
+<!--        tbody.innerHTML = '';-->
+<!--        accounts.forEach(a => {-->
+<!--            let actionCell = '';-->
+<!--            if (mode === 'delete') {-->
+<!--                actionCell = `<button onclick="deleteAccount('${a.accountNumber}')">Delete</button>`;-->
+<!--            } else if (mode === 'modify') {-->
+<!--                actionCell = `<input type="number" id="bal-${a.accountNumber}" value="${a.balance}" step="0.01" style="width:100px">-->
+<!--                                  <button onclick="modifyAccount('${a.accountNumber}')">Save</button>`;-->
+<!--            } else {-->
+<!--                actionCell = '-';-->
+<!--            }-->
+<!--            tbody.innerHTML += `<tr><td>${a.username}</td><td>${a.accountNumber}</td><td>${a.balance}</td><td>${actionCell}</td></tr>`;-->
+<!--        });-->
+<!--    }-->
+
+<!--    function deleteAccount(accountNumber) {-->
+<!--        if (!confirm(`Delete account ${accountNumber}? This cannot be undone.`)) return;-->
+<!--        fetch(`/api/admin/accounts/${accountNumber}`, {-->
+<!--            method: 'DELETE',-->
+<!--            headers: { 'Authorization': 'Bearer ' + token }-->
+<!--        })-->
+<!--            .then(() => search())-->
+<!--            .catch(() => alert('Delete failed'));-->
+<!--    }-->
+
+<!--    function modifyAccount(accountNumber) {-->
+<!--        const newBalance = document.getElementById(`bal-${accountNumber}`).value;-->
+<!--        fetch(`/api/admin/accounts/${accountNumber}`, {-->
+<!--            method: 'PUT',-->
+<!--            headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },-->
+<!--            body: JSON.stringify({ balance: newBalance })-->
+<!--        })-->
+<!--            .then(() => { alert('Updated'); search(); })-->
+<!--            .catch(() => alert('Update failed'));-->
+<!--    }-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->

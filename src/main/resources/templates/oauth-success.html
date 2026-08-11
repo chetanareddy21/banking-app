@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signing in...</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="container">
+    <div class="brand">
+        <div class="brand-badge">✓</div>
+        <h2>Almost there</h2>
+        <p class="subtitle">Finishing your secure sign-in</p>
+    </div>
+    <p class="status-loading"><span class="loading-spinner"></span> Finalizing your login...</p>
+</div>
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+
+    if (token) {
+        localStorage.setItem('token', token);
+        localStorage.setItem('role', 'USER');
+        window.location.href = '/user-dashboard';
+    } else {
+        window.location.href = '/login';
+    }
+</script>
+</body>
+</html>

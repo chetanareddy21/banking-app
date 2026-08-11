@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration - NetBanking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header Bar */
+        .header {
+            background: linear-gradient(90deg, #003366 0%, #002244 100%);
+            color: #ffffff;
+            padding: 15px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .header .logo {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .header .logo span {
+            color: #F37021;
+            margin-left: 5px;
+        }
+
+        .header .tagline {
+            font-size: 13px;
+            color: #cccccc;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        /* Registration Card */
+        .register-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 440px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-top: 5px solid #F37021; /* Accent Orange */
+        }
+
+        .card-header {
+            background-color: #fafafa;
+            padding: 20px 25px;
+            border-bottom: 1px solid #eeeeee;
+            text-align: center;
+        }
+
+        .card-header h2 {
+            font-size: 20px;
+            color: #003366;
+            font-weight: 700;
+        }
+
+        .card-body {
+            padding: 30px 25px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 11px 14px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: #F37021;
+            box-shadow: 0 0 5px rgba(243, 112, 33, 0.25);
+        }
+
+        /* Subtext under input fields */
+        .form-text {
+            font-size: 11px;
+            color: #777777;
+            margin-top: 4px;
+        }
+
+        /* Primary Action Button - ICICI Orange */
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #F37021;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 8px;
+        }
+
+        .btn-submit:hover {
+            background-color: #d95e14;
+        }
+
+        /* Navigation Links */
+        .links-container {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eeeeee;
+            display: flex;
+            justify-content: center;
+            font-size: 13px;
+        }
+
+        .links-container a {
+            color: #003366;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .links-container a:hover {
+            color: #F37021;
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #eef2f5;
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            color: #666666;
+            border-top: 1px solid #dddddd;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header Bar -->
+<div class="header">
+    <div class="logo">BANKING<span>APP</span></div>
+    <div class="tagline">Personal NetBanking Registration</div>
+</div>
+
+<!-- Main Content -->
+<div class="main-container">
+    <div class="register-card">
+        <div class="card-header">
+            <h2>Create Your Account</h2>
+        </div>
+        <div class="card-body">
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" class="form-control" id="username" placeholder="Choose a Username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Create Password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="pin">Transaction PIN</label>
+                    <input type="password" class="form-control" id="pin" placeholder="4-digit PIN for your account" required maxlength="6" pattern="[0-9]{4,6}">
+                    <div class="form-text">Used to authorize transfers and account updates.</div>
+                </div>
+
+                <button type="submit" class="btn-submit">Register Account</button>
+            </form>
+
+            <!-- Navigation Links -->
+            <div class="links-container">
+                <a href="/login">Already registered? Log in here</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    &copy; Banking Application. All Rights Reserved.
+</div>
+
+<script>
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const pin = document.getElementById('pin').value;
+
+        try {
+            const res = await fetch('/api/user/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, pin })
+            });
+
+            if (!res.ok) {
+                alert('Registration failed. Username may already exist.');
+                return;
+            }
+
+            alert('Registration successful! Redirecting to login...');
+            window.location.href = '/login';
+        } catch (err) {
+            alert('Server connectivity issue. Please try again.');
+        }
+    });
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head><meta charset="UTF-8"><title>Register</title></head>-->
+<!--<body>-->
+<!--<h2>Register</h2>-->
+<!--<form id="registerForm">-->
+<!--    <input type="text" id="username" placeholder="Username" required><br>-->
+<!--    <input type="password" id="password" placeholder="Password" required><br>-->
+<!--    <button type="submit">Register</button>-->
+<!--</form>-->
+<!--<p><a href="/user-login">Already have an account? Login</a></p>-->
+
+<!--<script>-->
+<!--    document.getElementById('registerForm').addEventListener('submit', async (e) => {-->
+<!--        e.preventDefault();-->
+<!--        const username = document.getElementById('username').value;-->
+<!--        const password = document.getElementById('password').value;-->
+
+<!--        const res = await fetch('/api/user/register', {-->
+<!--            method: 'POST',-->
+<!--            headers: { 'Content-Type': 'application/json' },-->
+<!--            body: JSON.stringify({ username, password })-->
+<!--        });-->
+
+<!--        if (res.ok) {-->
+<!--            alert('Registered! Please log in.');-->
+<!--            window.location.href = '/user-login';-->
+<!--        } else {-->
+<!--            alert('Registration failed');-->
+<!--        }-->
+<!--    });-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->

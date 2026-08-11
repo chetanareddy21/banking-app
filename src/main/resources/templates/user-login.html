@@ -1,0 +1,358 @@
+
+
+
+
+
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login - NetBanking</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Top Header Bar */
+        .header {
+            background: linear-gradient(90deg, #003366 0%, #002244 100%);
+            color: #ffffff;
+            padding: 15px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .header .logo {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .header .logo span {
+            color: #F37021; /* ICICI Orange */
+            margin-left: 5px;
+        }
+
+        .header .tagline {
+            font-size: 13px;
+            color: #cccccc;
+        }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        /* Login Card */
+        .login-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border-top: 5px solid #F37021;
+        }
+
+        .card-header {
+            background-color: #fafafa;
+            padding: 20px 25px;
+            border-bottom: 1px solid #eeeeee;
+            text-align: center;
+        }
+
+        .card-header h2 {
+            font-size: 20px;
+            color: #003366;
+            font-weight: 700;
+        }
+
+        .card-body {
+            padding: 30px 25px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 11px 14px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: #003366;
+            box-shadow: 0 0 5px rgba(0, 51, 102, 0.2);
+        }
+
+        /* Primary Action Button */
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #F37021;
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: bold;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 5px;
+        }
+
+        .btn-submit:hover {
+            background-color: #d95e12;
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .divider span {
+            padding: 0 10px;
+        }
+
+        /* Google OAuth Button */
+        .btn-google {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px;
+            background-color: #ffffff;
+            color: #555555;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .btn-google:hover {
+            background-color: #f8f9fa;
+            border-color: #b5b5b5;
+        }
+
+        .btn-google svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Navigation Links */
+        .links-container {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eeeeee;
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+        }
+
+        .links-container a {
+            color: #003366;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .links-container a:hover {
+            color: #F37021;
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #eef2f5;
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            color: #666666;
+            border-top: 1px solid #dddddd;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Header Bar -->
+<div class="header">
+    <div class="logo">BANKING<span>APP</span></div>
+    <div class="tagline">Safe & Secure Internet Banking</div>
+</div>
+
+<!-- Main Content -->
+<div class="main-container">
+    <div class="login-card">
+        <div class="card-header">
+            <h2>User Login</h2>
+        </div>
+        <div class="card-body">
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">User ID / Username</label>
+                    <input type="text" class="form-control" id="username" placeholder="Enter Username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Enter Password" required>
+                </div>
+                <button type="submit" class="btn-submit">Login</button>
+            </form>
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+            <!-- Google OAuth Link -->
+            <a href="/oauth2/authorization/google" class="btn-google">
+                <svg viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+                Login with Google
+            </a>
+
+            <!-- Nav Links -->
+            <div class="links-container">
+                <a href="/user-register">Register Account</a>
+                <a href="/login">Back to Portal</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    &copy; Banking Application. All Rights Reserved.
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const res = await fetch('/api/user/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (!res.ok) {
+                alert('Invalid credentials. Please try again.');
+                return;
+            }
+
+            const data = await res.json();
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('role', data.role);
+            window.location.href = '/user-dashboard';
+        } catch (err) {
+            alert('Connection error. Please try again later.');
+        }
+    });
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head><meta charset="UTF-8"><title>User Login</title></head>-->
+<!--<body>-->
+<!--<h2>User Login</h2>-->
+<!--<form id="loginForm">-->
+<!--    <input type="text" id="username" placeholder="Username" required><br>-->
+<!--    <input type="password" id="password" placeholder="Password" required><br>-->
+<!--    <button type="submit">Login</button>-->
+<!--</form>-->
+<!--<p><a href="/user-register">Don't have an account? Register</a></p>-->
+<!--<p><a href="/oauth2/authorization/google">Login with Google</a></p>-->
+<!--<p><a href="/login">Back</a></p>-->
+
+<!--<script>-->
+<!--    document.getElementById('loginForm').addEventListener('submit', async (e) => {-->
+<!--        e.preventDefault();-->
+<!--        const username = document.getElementById('username').value;-->
+<!--        const password = document.getElementById('password').value;-->
+
+<!--        const res = await fetch('/api/user/login', {-->
+<!--            method: 'POST',-->
+<!--            headers: { 'Content-Type': 'application/json' },-->
+<!--            body: JSON.stringify({ username, password })-->
+<!--        });-->
+
+<!--        if (!res.ok) { alert('Invalid credentials'); return; }-->
+
+<!--        const data = await res.json();-->
+<!--        localStorage.setItem('token', data.token);-->
+<!--        localStorage.setItem('role', data.role);-->
+<!--        window.location.href = '/user-dashboard';-->
+<!--    });-->
+<!--</script>-->
+<!--</body>-->
+<!--</html>-->

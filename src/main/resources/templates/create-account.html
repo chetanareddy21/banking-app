@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title>Create Account</title></head>
+<body>
+<h2>Create New Account</h2>
+<button onclick="createAccount()">Create</button>
+<p id="result"></p>
+<p><a href="/user-dashboard">Back</a></p>
+
+<script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login';
+
+    function createAccount() {
+        fetch('/api/account/create', {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + token }
+        })
+            .then(res => res.json())
+            .then(data => document.getElementById('result').innerText = `New account created: ${data.accountNumber}`)
+            .catch(() => document.getElementById('result').innerText = 'Failed to create account');
+    }
+</script>
+</body>
+</html>
